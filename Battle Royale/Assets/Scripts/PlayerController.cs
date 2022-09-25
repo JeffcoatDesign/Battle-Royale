@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviourPun
 {
     [Header("Info")]
     public int id;
-    private int CurAttackerId;
+    private int curAttackerId;
 
     [Header("Stats")]
     public float moveSpeed;
@@ -83,7 +83,7 @@ public class PlayerController : MonoBehaviourPun
             return;
 
         curHp -= damage;
-        CurAttackerId = attackerId;
+        curAttackerId = attackerId;
 
         //flash the player red
         photonView.RPC("DamageFlash", RpcTarget.Others);
@@ -120,6 +120,37 @@ public class PlayerController : MonoBehaviourPun
     [PunRPC]
     void Die ()
     {
+        curHp = 0;
+        dead = true;
 
+        GameManager.instance.alivePlayers--;
+
+        //host will check win condition
+        if (PhotonNetwork.IsMasterClient)
+            GameManager.instance.CheckWinCondition();
+
+        // is this our local player?
+        if(photonView.IsMine)
+        {
+            if(curAttackerId != 0)
+            {
+                GameManager.instance.GetPlayer(curAttackerId).photonView.RPC("AddKill", RpcTarget.All);
+
+                //set the cam to spectator
+                GetComponentInChildren<CameraController>().SetAsSpectator();
+
+                //disable the physics and hide the player
+                rig.isKinematic = true;
+                transform.position = new Vector3(0, -50, 0);
+            }
+        }
+    }
+
+    [PunRPC]
+    public void AddKill ()
+    {
+        kills++;
+
+        // update game UI
     }
 }
