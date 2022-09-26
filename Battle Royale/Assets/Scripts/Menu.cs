@@ -95,7 +95,7 @@ public class Menu : MonoBehaviourPunCallbacks, ILobbyCallbacks
         SetScreen(lobbyBrowserScreen);
     }
 
-        //CREATE ROOM SCREEN
+        //CREATE ROOM SCREEN  
 
     public void OnCreateButton (TMP_InputField roomNameInput)
     {

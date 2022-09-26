@@ -36,6 +36,7 @@ public class PlayerWeapon : MonoBehaviour
         lastShootTime = Time.time;
 
         // update the ammo UI
+        GameUI.instance.UpdateAmmoText();
 
         // spawn the bullet
         player.photonView.RPC("SpawnBullet", RpcTarget.All, bulletSpawnPos.position, Camera.main.transform.forward);
@@ -54,5 +55,14 @@ public class PlayerWeapon : MonoBehaviour
         //initialize it and set velocity
         bulletScript.Initialize(damage, player.id, player.photonView.IsMine);
         bulletScript.rig.velocity = dir * bulletSpeed;
+    }
+
+    [PunRPC]
+    public void GiveAmmo (int ammoToGive)
+    {
+        curAmmo = Mathf.Clamp(curAmmo + ammoToGive, 0, maxAmmo);
+
+        //update ammo ui
+        GameUI.instance.UpdateAmmoText();
     }
 }
